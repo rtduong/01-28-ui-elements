@@ -93,6 +93,12 @@ public class BluetoothChatFragment extends Fragment {
         setHasOptionsMenu(true);
 
         // TODO: Get local Bluetooth adapter
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(mBluetoothAdapter == null) {
+            Toast.makeText(getActivity(), "Bluetooth is not available.",
+                    Toast.LENGTH_LONG).show();
+            getActivity().finish();
+        }
 
         /**
          *  TODO: If the adapter is null, then Bluetooth is not supported.
@@ -108,13 +114,20 @@ public class BluetoothChatFragment extends Fragment {
         if (mBluetoothAdapter != null) {
             // If BT is not on, request that it be enabled.
             // setupChat() will then be called during onActivityResult
+            if(!mBluetoothAdapter.isEnabled()) {
+                Intent i = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(i, REQUEST_ENABLE_BT);
+            }
+            else if(mChatService == null) {
+                    setupChat();
+            }
+        }
             /**
              * TODO: Check if the adapter is enabled
              * TODO: If NOT, send an Implicit Intent with the action ACTION_REQUEST_ENABLE (send for a result)
              * TODO: Otherwise, check if the BluetoothChatService is null, and if so call setupChat() to set it up.
              */
 
-        }
     }
 
     @Override
@@ -192,7 +205,11 @@ public class BluetoothChatFragment extends Fragment {
      * Makes this device discoverable.
      */
     private void ensureDiscoverable() {
-
+        if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            Intent i = new Intent (BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            i.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivity(i);
+        }
         /**
          * TODO: Check if the adapter is in SCAN_MODE_CONNECTABLE_DISCOVERBLE mode
          * TODO: If not, send an Implicit Intent for the ACTION_REQUEST_DISCOVERABLE action (with an extra for the EXTRA_DISCOVERABLE_DURATION)
@@ -215,6 +232,11 @@ public class BluetoothChatFragment extends Fragment {
         // Check that there's actually something to send
         if (message.length() > 0) {
 
+            byte[] bytes = message.getBytes();
+            mChatService.write(bytes);
+
+            mOutStringBuffer.setLength(0);
+            mOutEditText.setText(mOutStringBuffer);
             /**
              * TODO: get the bytes() of the message
              * TODO: use the mChatService's .write() method to send these bytes
@@ -371,6 +393,10 @@ public class BluetoothChatFragment extends Fragment {
          * TODO: Then tell the mChatService to connect to that device!
          */
 
+        String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+
+        mChatService.connect(device, secure);
     }
 
     @Override
