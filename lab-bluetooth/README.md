@@ -17,7 +17,7 @@ Your task is to fill in the missing pieces of code, following the instructions b
 
 2. You'll need to request [permission][http://developer.android.com/guide/topics/connectivity/bluetooth.html#Permissions] to use Bluetooth. Add the appropriate `<uses-permission>` attributes: one for `BLUETOOTH` (for communication) and one for `BLUETOOTH_ADMIN` (to "discover" devices and make connections).
 
-3. The main UI is defined in the `BluetoothChatFragment` class, which is a Fragment that holds the chat system. Start by filling in the `onCreate()` callback by <a href="http://developer.android.com/reference/android/bluetooth/BluetoothAdapter.html#getDefaultAdapter()">fetching the default Bluetooth adapter</a> and saving it as an instance variable (`mBluetoothAdapter`). If the adapter doesn't exist (is `null`), you should `Toast` a message that Bluetooth isn't available, and then call `finish()` on the
+3. The main UI is defined in the `BluetoothChatFragment` class, which is a Fragment that holds the chat system. Start by filling in the `onCreate()` callback by <a href="http://developer.android.com/reference/android/bluetooth/BluetoothAdapter.html#getDefaultAdapter()">fetching the default Bluetooth adapter</a> and saving it as an instance variable (`mBluetoothAdapter`). If the adapter doesn't exist (is `null`), you should `Toast` a message that Bluetooth isn't available, and then call `finish()` on the Fragment's _Activity_ (to close the application).
 
 4. You'll want your app to make sure that the user has Bluetooth turned on. In the `onStart()` method (assuming the adapter exists), check to see if the `BluetoothAdapter` (the one you just fetched) `isEnabled()`.
 
